@@ -54,7 +54,7 @@ describe('Bindings', function () {
     });
   });
 
-  describe('A Bindings object with one binding', function () {
+  describe('A Bindings object to which one binding has been added', function () {
     var bindings = new Bindings();
     bindings.a = 'A';
 
@@ -93,7 +93,7 @@ describe('Bindings', function () {
     });
   });
 
-  describe('A Bindings object with three bindings', function () {
+  describe('A Bindings object to which three bindings have been added', function () {
     var bindings = new Bindings();
     bindings.a = 'A';
     bindings.b = 'B';
@@ -147,6 +147,60 @@ describe('Bindings', function () {
       expect(bindings.a).to.equal('G');
       expect(bindings.b).to.equal('H');
       expect(bindings.c).to.equal('I');
+    });
+  });
+
+  describe('A Bindings object created with new and initialized with three properties', function () {
+    var bindings = new Bindings({ a: 'A', b: 'B', c: 'C' });
+
+    it('returns the values when accessing the properties', function () {
+      expect(bindings.a).to.equal('A');
+      expect(bindings.b).to.equal('B');
+      expect(bindings.c).to.equal('C');
+    });
+
+    it('returns true when checking if the properties exist', function () {
+      expect('a' in bindings).to.be.true;
+      expect('b' in bindings).to.be.true;
+      expect('c' in bindings).to.be.true;
+    });
+
+    it('returns false when checking if another property exists', function () {
+      expect('d' in bindings).to.be.false;
+    });
+
+    it('enumerates over the properties', function () {
+      var properties = [];
+      for (var binding in bindings)
+        properties.push(binding);
+      expect(properties).to.deep.equal(['a', 'b', 'c']);
+    });
+  });
+
+  describe('A Bindings object created without new and initialized with three properties', function () {
+    var bindings = Bindings({ a: 'A', b: 'B', c: 'C' });
+
+    it('returns the values when accessing the properties', function () {
+      expect(bindings.a).to.equal('A');
+      expect(bindings.b).to.equal('B');
+      expect(bindings.c).to.equal('C');
+    });
+
+    it('returns true when checking if the properties exist', function () {
+      expect('a' in bindings).to.be.true;
+      expect('b' in bindings).to.be.true;
+      expect('c' in bindings).to.be.true;
+    });
+
+    it('returns false when checking if another property exists', function () {
+      expect('d' in bindings).to.be.false;
+    });
+
+    it('enumerates over the properties', function () {
+      var properties = [];
+      for (var binding in bindings)
+        properties.push(binding);
+      expect(properties).to.deep.equal(['a', 'b', 'c']);
     });
   });
 });

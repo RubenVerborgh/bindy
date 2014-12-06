@@ -5,21 +5,28 @@ using namespace v8;
 
 Persistent<Function> Bindings::constructor;
 
-// Creates a new Bindings object (with or without the `new` operator)
+// Creates a new Bindings object
 Handle<Value> Bindings::New(const Arguments& args) {
-  HandleScope scope;
-  // Invoked as constructor
-  if (args.IsConstructCall()) {
-    Bindings* bindings = new Bindings();
-    bindings->Wrap(args.This());
-    return args.This();
+  NanScope();
+  // Ensure the object is constructed with `new`
+  if (!args.IsConstructCall()) {
+    const int argc = 1;
+    Local<Value> argv[argc] = { args.Length() ? args[0] : (Local<Value>)NanUndefined() };
+    NanReturnValue(constructor->NewInstance(argc, argv));
   }
-  // Invoked as function; turn into construct call
-  else {
-    const int argc = 0;
-    Local<Value> argv[argc] = {};
-    return scope.Close(constructor->NewInstance(argc, argv));
+  // Wrap the Bindings object around the internal Bindings class
+  Bindings* bindings = new Bindings();
+  bindings->Wrap(args.This());
+  // If an initializer object is specified, take over its properties
+  if (args.Length() && args[0]->IsObject()) {
+    const Local<Object>& defaults = Local<Object>::Cast(args[0]);
+    const Local<Array>& properties = defaults->GetPropertyNames();
+    for (uint32_t i = 0, l = properties->Length(); i < l; i++) {
+      const Local<Value>& key = properties->Get(i);
+      (*bindings)[*NanUtf8String(key)] = *NanUtf8String(defaults->Get(key));
+    }
   }
+  NanReturnValue(args.This());
 }
 
 // Gets the value of a property
