@@ -203,4 +203,32 @@ describe('Bindings', function () {
       expect(properties).to.deep.equal(['a', 'b', 'c']);
     });
   });
+
+  describe('A Bindings object initialized with another Bindings object', function () {
+    var initializer = new Bindings({ a: 'A', b: 'B', c: 'C' });
+    var bindings = new Bindings(initializer);
+
+    it('returns the values when accessing the properties', function () {
+      expect(bindings.a).to.equal('A');
+      expect(bindings.b).to.equal('B');
+      expect(bindings.c).to.equal('C');
+    });
+
+    it('returns true when checking if the properties exist', function () {
+      expect('a' in bindings).to.be.true;
+      expect('b' in bindings).to.be.true;
+      expect('c' in bindings).to.be.true;
+    });
+
+    it('returns false when checking if another property exists', function () {
+      expect('d' in bindings).to.be.false;
+    });
+
+    it('enumerates over the properties', function () {
+      var properties = [];
+      for (var binding in bindings)
+        properties.push(binding);
+      expect(properties).to.deep.equal(['a', 'b', 'c']);
+    });
+  });
 });

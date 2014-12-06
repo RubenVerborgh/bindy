@@ -14,16 +14,24 @@ Handle<Value> Bindings::New(const Arguments& args) {
     Local<Value> argv[argc] = { args.Length() ? args[0] : (Local<Value>)NanUndefined() };
     NanReturnValue(constructor->NewInstance(argc, argv));
   }
-  // Wrap the Bindings object around the internal Bindings class
+  // Wrap the internal Bindings class around the object
   Bindings* bindings = new Bindings();
   bindings->Wrap(args.This());
   // If an initializer object is specified, take over its properties
   if (args.Length() && args[0]->IsObject()) {
     const Local<Object>& defaults = Local<Object>::Cast(args[0]);
-    const Local<Array>& properties = defaults->GetPropertyNames();
-    for (uint32_t i = 0, l = properties->Length(); i < l; i++) {
-      const Local<Value>& key = properties->Get(i);
-      (*bindings)[*NanUtf8String(key)] = *NanUtf8String(defaults->Get(key));
+    // Take over properties from a Bindings object
+    if (defaults->GetConstructorName()->StrictEquals(constructor->GetName())) {
+      const Bindings* defaultBindings = Unwrap<Bindings>(defaults);
+      bindings->insert(defaultBindings->begin(), defaultBindings->end());
+    }
+    // Take over properties from an arbitrary object
+    else {
+      const Local<Array>& properties = defaults->GetPropertyNames();
+      for (uint32_t i = 0, l = properties->Length(); i < l; i++) {
+        const Local<Value>& key = properties->Get(i);
+        (*bindings)[*NanUtf8String(key)] = *NanUtf8String(defaults->Get(key));
+      }
     }
   }
   NanReturnValue(args.This());
