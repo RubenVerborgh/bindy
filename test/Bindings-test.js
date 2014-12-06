@@ -231,4 +231,94 @@ describe('Bindings', function () {
       expect(properties).to.deep.equal(['a', 'b', 'c']);
     });
   });
+
+  describe('Bindings.uniqueValues', function () {
+    describe('without arguments', function () {
+      it('returns an empty array', function () {
+        expect(Bindings.uniqueValues()).to.deep.equal([]);
+      });
+    });
+
+    describe('with a non-array value without key', function () {
+      it('returns an empty array', function () {
+        expect(Bindings.uniqueValues(null)).to.deep.equal([]);
+      });
+    });
+
+    describe('with a non-array value with key', function () {
+      it('returns an empty array', function () {
+        expect(Bindings.uniqueValues(null, 'a')).to.deep.equal([]);
+      });
+    });
+
+    describe('with an empty array without key', function () {
+      it('returns an empty array', function () {
+        expect(Bindings.uniqueValues([])).to.deep.equal([]);
+      });
+    });
+
+    describe('with an empty array with key', function () {
+      it('returns an empty array', function () {
+        expect(Bindings.uniqueValues([], 'a')).to.deep.equal([]);
+      });
+    });
+
+    describe('with a one-element array without key', function () {
+      var bindingsArray = [
+        new Bindings({ a: 'A' }),
+      ];
+
+      it('returns an empty array', function () {
+        expect(Bindings.uniqueValues(bindingsArray)).to.deep.equal([]);
+      });
+    });
+
+    describe('with a one-element array with matching key', function () {
+      var bindingsArray = [
+        new Bindings({ a: 'A' }),
+      ];
+
+      it('returns an array with the value', function () {
+        expect(Bindings.uniqueValues(bindingsArray, 'a')).to.deep.equal(['A']);
+      });
+    });
+
+    describe('with a one-element array with non-matching key', function () {
+      var bindingsArray = [
+        new Bindings({ a: 'A' }),
+      ];
+
+      it('returns an array with the value', function () {
+        expect(Bindings.uniqueValues(bindingsArray, 'a')).to.deep.equal(['A']);
+      });
+    });
+
+    describe('with a five-element array with matching key', function () {
+      var bindingsArray = [
+        new Bindings({ a: 'A1', b: 'B1' }),
+        new Bindings({ a: 'A2', b: 'B2' }),
+        new Bindings({ a: 'A1', b: 'B3' }),
+        new Bindings({ a: 'A3', b: 'B4' }),
+        new Bindings({ b: 'B5' }),
+      ];
+
+      it('returns an array with the unique values for that key', function () {
+        expect(Bindings.uniqueValues(bindingsArray, 'a')).to.deep.equal(['A1', 'A2', 'A3']);
+      });
+    });
+
+    describe('with a five-element array with non-matching key', function () {
+      var bindingsArray = [
+        new Bindings({ a: 'A1', b: 'B1' }),
+        new Bindings({ a: 'A2', b: 'B2' }),
+        new Bindings({ a: 'A1', b: 'B3' }),
+        new Bindings({ a: 'A3', b: 'B4' }),
+        new Bindings({ b: 'B5' }),
+      ];
+
+      it('returns an empty array', function () {
+        expect(Bindings.uniqueValues(bindingsArray, 'c')).to.deep.equal([]);
+      });
+    });
+  });
 });

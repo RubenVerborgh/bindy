@@ -1,4 +1,5 @@
 #include "Bindings.h"
+#include <set>
 
 using namespace std;
 using namespace v8;
@@ -81,8 +82,29 @@ NAN_PROPERTY_ENUMERATOR(Bindings::EnumerateNamedProperties) {
   NanReturnValue(names);
 }
 
+// uniqueValues(array_of_bindings, key)
+// Gets the unique values associated with the key in the given objects.
+NAN_METHOD(Bindings::UniqueValues) {
+  NanScope();
+  Local<Array> keyArray = NanNew<Array>();
+  if (args.Length() == 2 && args[0]->IsArray()) {
+    const Local<Array>& bindingsArray = Local<Array>::Cast(args[0]);
+    const string& key = *NanUtf8String(args[1]->ToString());
+    // Store unique values in a set
+    set<string> keys;
+    for (uint32_t i = 0, count = 0; i < bindingsArray->Length(); i++) {
+      const Bindings* bindings = Unwrap<Bindings>(Local<Object>::Cast(bindingsArray->Get(i)));
+      const Bindings::const_iterator value = bindings->find(key);
+      if (value != bindings->end() && keys.insert(value->second).second)
+        keyArray->Set(count++, NanNew<String>(value->second));
+    }
+  }
+  NanReturnValue(keyArray);
+}
+
 // Initializes the Bindings module
-void Bindings::Init(Handle<Object> exports, Handle<Object> module) {
+void Bindings::Init(const Handle<Object> exports, Handle<Object> module) {
+  // Create the constructor
   Local<FunctionTemplate> constructorTemplate = NanNew<FunctionTemplate>(New);
   constructorTemplate->SetClassName(NanNew<String>("Bindings"));
   constructorTemplate->InstanceTemplate()->SetInternalFieldCount(1);
@@ -91,7 +113,10 @@ void Bindings::Init(Handle<Object> exports, Handle<Object> module) {
     DeleteNamedProperty, EnumerateNamedProperties);
   constructor = Persistent<Function>::New(constructorTemplate->GetFunction());
 
+  // Export the constructor and static member functions
   module->Set(NanNew<String>("exports"), constructor);
+  constructor->Set(NanNew<String>("uniqueValues"),
+                   NanNew<FunctionTemplate>(UniqueValues)->GetFunction());
 }
 
 NODE_MODULE(bindy, Bindings::Init)

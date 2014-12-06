@@ -11,6 +11,8 @@ class Bindings : public node::ObjectWrap, private std::map<const std::string, st
     static void Init(v8::Handle<v8::Object> target, v8::Handle<v8::Object> module);
     static NAN_METHOD(Create);
 
+    static NAN_METHOD(UniqueValues);
+
   private:
     static v8::Persistent<v8::Function> constructor;
     static v8::Handle<v8::Value> New(const v8::Arguments& args);
