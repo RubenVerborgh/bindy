@@ -1,0 +1,23 @@
+{
+  "name": "bindy",
+  "version": "0.0.1",
+  "author": "Ruben Verborgh <ruben.verborgh@gmail.com>",
+  "main": "build/Release/bindy",
+  "dependencies": {
+    "nan": "^1.4.1"
+  },
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "jshint": "^2.5.10",
+    "mocha": "^2.0.1",
+    "pre-commit": "0.0.9"
+  },
+  "scripts": {
+    "test": "node-gyp build && mocha",
+    "hint": "jshint lib test"
+  },
+  "pre-commit": [
+    "hint",
+    "test"
+  ]
+}
