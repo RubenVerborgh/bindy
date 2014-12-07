@@ -11,7 +11,12 @@ class Bindings : public node::ObjectWrap, private std::map<const std::string, st
     static void Init(v8::Handle<v8::Object> target, v8::Handle<v8::Object> module);
     static NAN_METHOD(Create);
 
+    static NAN_METHOD(Equals);
     static NAN_METHOD(UniqueValues);
+
+    friend inline bool operator==(const Bindings& a, const Bindings& b) {
+      return ((std::map<const std::string, std::string>)a) == b;
+    }
 
   private:
     static v8::Persistent<v8::Function> constructor;

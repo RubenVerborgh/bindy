@@ -82,6 +82,24 @@ NAN_PROPERTY_ENUMERATOR(Bindings::EnumerateNamedProperties) {
   NanReturnValue(names);
 }
 
+// equals(bindingA, bindingB)
+// Checks whether both bindings have the exact same keys and values.
+NAN_METHOD(Bindings::Equals) {
+  NanScope();
+  if (args.Length() != 2 || !args[0]->IsObject() || !args[1]->IsObject())
+    ThrowException(Exception::Error(NanNew<String>("equals requires two Object arguments.")));
+
+  const Local<Object>& objectA = Local<Object>::Cast(args[0]);
+  const Local<Object>& objectB = Local<Object>::Cast(args[1]);
+  if (!objectA->GetConstructorName()->StrictEquals(constructor->GetName()) ||
+      !objectB->GetConstructorName()->StrictEquals(constructor->GetName()))
+    NanReturnValue(NanFalse());
+
+  const Bindings* bindingsA = Unwrap<Bindings>(objectA);
+  const Bindings* bindingsB = Unwrap<Bindings>(objectB);
+  NanReturnValue(*bindingsA == *bindingsB ? NanTrue() : NanFalse());
+}
+
 // uniqueValues(array_of_bindings, key)
 // Gets the unique values associated with the key in the given objects.
 NAN_METHOD(Bindings::UniqueValues) {
@@ -115,6 +133,8 @@ void Bindings::Init(const Handle<Object> exports, Handle<Object> module) {
 
   // Export the constructor and static member functions
   module->Set(NanNew<String>("exports"), constructor);
+  constructor->Set(NanNew<String>("equals"),
+                   NanNew<FunctionTemplate>(Equals)->GetFunction());
   constructor->Set(NanNew<String>("uniqueValues"),
                    NanNew<FunctionTemplate>(UniqueValues)->GetFunction());
 }

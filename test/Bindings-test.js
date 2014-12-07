@@ -232,6 +232,93 @@ describe('Bindings', function () {
     });
   });
 
+  describe('Bindings.equals', function () {
+    describe('without arguments', function () {
+      it('throw an Error', function () {
+        expect(function () { Bindings.equals(); })
+        .to.throw(Error, 'equals requires two Object arguments.');
+      });
+    });
+
+    describe('with one argument', function () {
+      it('throw an Error', function () {
+        expect(function () { Bindings.equals(new Bindings()); })
+        .to.throw(Error, 'equals requires two Object arguments.');
+      });
+    });
+
+    describe('with two arguments, one of which is not an object', function () {
+      it('throw an Error', function () {
+        expect(function () { Bindings.equals(new Bindings(), false); })
+        .to.throw(Error, 'equals requires two Object arguments.');
+      });
+    });
+
+    describe('with the first argument a non-Bindings object', function () {
+      it('returns false', function () {
+        expect(Bindings.equals({},
+                               new Bindings()))
+        .to.be.false;
+      });
+    });
+
+    describe('with the second argument a non-Bindings object', function () {
+      it('returns false', function () {
+        expect(Bindings.equals(new Bindings(),
+                               {}))
+        .to.be.false;
+      });
+    });
+
+    describe('with two empty bindings', function () {
+      it('returns true', function () {
+        expect(Bindings.equals(new Bindings(),
+                               new Bindings()))
+        .to.be.true;
+      });
+    });
+
+    describe('with empty and a non-empty bindings', function () {
+      it('returns false', function () {
+        expect(Bindings.equals(new Bindings(),
+                               new Bindings({ a: 'A' })))
+        .to.be.false;
+      });
+    });
+
+    describe('with identical bindings with one element', function () {
+      it('returns true', function () {
+        expect(Bindings.equals(new Bindings({ a: 'A' }),
+                               new Bindings({ a: 'A' })))
+        .to.be.true;
+      });
+    });
+
+    describe('with non-identical bindings with one element', function () {
+      it('returns false', function () {
+        expect(Bindings.equals(new Bindings({ a: 'A' }),
+                               new Bindings({ a: 'B' })))
+        .to.be.false;
+      });
+    });
+
+    describe('with identical bindings with two elements', function () {
+      it('returns true', function () {
+        expect(Bindings.equals(new Bindings({ a: 'A', b: 'B' }),
+                               new Bindings({ a: 'A', b: 'B' })))
+        .to.be.true;
+      });
+    });
+
+    describe('with non-identical bindings with two elements', function () {
+      it('returns false', function () {
+        expect(Bindings.equals(new Bindings({ a: 'A', b: 'B' }),
+                               new Bindings({ a: 'A', b: 'C' })))
+        .to.be.false;
+      });
+    });
+  });
+
   describe('Bindings.uniqueValues', function () {
     describe('without arguments', function () {
       it('returns an empty array', function () {
