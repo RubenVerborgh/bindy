@@ -319,6 +319,70 @@ describe('Bindings', function () {
     });
   });
 
+  describe('Bindings.merge', function () {
+    describe('without arguments', function () {
+      it('returns an empty Bindings object', function () {
+        var merged = Bindings.merge();
+        expect(merged).to.be.an.instanceof(Bindings);
+        expect(merged).to.deep.equal(new Bindings());
+      });
+    });
+
+    describe('with an empty bindings object', function () {
+      it('returns an empty Bindings object', function () {
+        var merged = Bindings.merge(new Bindings());
+        expect(merged).to.be.an.instanceof(Bindings);
+        expect(merged).to.deep.equal(new Bindings());
+      });
+    });
+
+    describe('with an empty array', function () {
+      it('returns an empty Bindings object', function () {
+        var merged = Bindings.merge([]);
+        expect(merged).to.be.an.instanceof(Bindings);
+        expect(merged).to.deep.equal(new Bindings());
+      });
+    });
+
+    describe('with a single bindings object', function () {
+      it('returns a copy of the bindings object', function () {
+        var bindings = new Bindings({ a: 'A', b: 'B' });
+        var merged = Bindings.merge(bindings);
+        expect(merged).to.not.equal(bindings);
+        expect(merged).to.deep.equal(bindings);
+      });
+    });
+
+    describe('with an array of a single bindings object', function () {
+      it('returns a copy of the bindings object', function () {
+        var bindings = new Bindings([{ a: 'A', b: 'B' }]);
+        var merged = Bindings.merge(bindings);
+        expect(merged).to.not.equal(bindings);
+        expect(merged).to.deep.equal(bindings);
+      });
+    });
+
+    describe('with multiple bindings objects', function () {
+      it('returns a merged bindings object', function () {
+        var merged = Bindings.merge(
+          new Bindings({ a: 'A', b: 'B' }),
+          new Bindings({ b: 'C', c: 'C' })
+        );
+        expect(merged).to.deep.equal(new Bindings({ a: 'A', b: 'B', c: 'C' }));
+      });
+    });
+
+    describe('with an array of a multiple bindings objects', function () {
+      it('returns a merged bindings object', function () {
+        var merged = Bindings.merge([
+          new Bindings({ a: 'A', b: 'B' }),
+          new Bindings({ b: 'C', c: 'C' }),
+        ]);
+        expect(merged).to.deep.equal(new Bindings({ a: 'A', b: 'B', c: 'C' }));
+      });
+    });
+  });
+
   describe('Bindings.uniqueValues', function () {
     describe('without arguments', function () {
       it('returns an empty array', function () {

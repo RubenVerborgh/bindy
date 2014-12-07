@@ -100,6 +100,33 @@ NAN_METHOD(Bindings::Equals) {
   NanReturnValue(*bindingsA == *bindingsB ? NanTrue() : NanFalse());
 }
 
+// merge(array_of_bindings)
+// merge(bindings1, ..., bindingsN)
+// Creates a binding that combines the given bindings
+NAN_METHOD(Bindings::Merge) {
+  NanScope();
+  // Create merged bindings
+  Local<Object> mergedObject = constructor->NewInstance();
+  Bindings* merged = Unwrap<Bindings>(mergedObject);
+  // Add all bindings
+  for (int i = 0; i < args.Length(); i++) {
+    // If the argument is a Bindings object, add its bindings
+    if (!args[i]->IsArray()) {
+      const Bindings* bindings = Unwrap<Bindings>(Local<Object>::Cast(args[i]));
+      merged->insert(bindings->begin(), bindings->end());
+    }
+    // If the argument is an array of Bindings objects, add the bindings of all items
+    else {
+      const Local<Array>& bindingsArray = Local<Array>::Cast(args[i]);
+      for (uint32_t j = 0; j < bindingsArray->Length(); j++) {
+        const Bindings* bindings = Unwrap<Bindings>(Local<Object>::Cast(bindingsArray->Get(j)));
+        merged->insert(bindings->begin(), bindings->end());
+      }
+    }
+  }
+  NanReturnValue(mergedObject);
+}
+
 // uniqueValues(array_of_bindings, key)
 // Gets the unique values associated with the key in the given objects.
 NAN_METHOD(Bindings::UniqueValues) {
@@ -135,6 +162,8 @@ void Bindings::Init(const Handle<Object> exports, Handle<Object> module) {
   module->Set(NanNew<String>("exports"), constructor);
   constructor->Set(NanNew<String>("equals"),
                    NanNew<FunctionTemplate>(Equals)->GetFunction());
+  constructor->Set(NanNew<String>("merge"),
+                   NanNew<FunctionTemplate>(Merge)->GetFunction());
   constructor->Set(NanNew<String>("uniqueValues"),
                    NanNew<FunctionTemplate>(UniqueValues)->GetFunction());
 }

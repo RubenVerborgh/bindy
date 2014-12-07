@@ -12,6 +12,7 @@ class Bindings : public node::ObjectWrap, private std::map<const std::string, st
     static NAN_METHOD(Create);
 
     static NAN_METHOD(Equals);
+    static NAN_METHOD(Merge);
     static NAN_METHOD(UniqueValues);
 
     friend inline bool operator==(const Bindings& a, const Bindings& b) {
